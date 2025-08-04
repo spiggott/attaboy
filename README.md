@@ -1,183 +1,277 @@
-# Attaboy - UTM Parameter Tracking Implementation for WordPress + WPForms
+# Attaboy 🎯
 
-## Overview
-This solution captures UTM parameters from incoming links, stores them in the user's browser, and automatically populates hidden form fields in WPForms for attribution tracking in ActiveCampaign.
+A lightweight JavaScript library for automatically capturing, storing, and managing UTM parameters across your website sessions.
 
-## Implementation Steps
+## Features
 
-### Step 1: Add the JavaScript to Your WordPress Site
+- 🚀 **Automatic UTM capture** - Grabs UTM parameters from the URL on page load
+- 💾 **Persistent storage** - Uses localStorage to maintain UTM data across sessions
+- 📝 **Form auto-population** - Automatically fills hidden form fields with stored UTM values
+- 🔧 **Simple API** - Easy-to-use JavaScript methods for accessing and managing UTM data
+- 📦 **Zero dependencies** - Pure vanilla JavaScript, no external libraries required
+- ⚡ **Lightweight** - Minimal footprint for fast page loads
 
-You have several options to add the UTM tracking script:
+## Installation
 
-#### Option A: Add to theme's functions.php (Recommended)
-Add this code to your theme's `functions.php` file:
+### Via jsDelivr CDN (Recommended)
 
-```php
-function enqueue_attaboy() {
-	wp_enqueue_script(
-		'attaboy',
-		get_template_directory_uri() . '/js/attaboy.js',
-		array(),
-		'1.0.0',
-		true
-	);
-}
-add_action('wp_enqueue_scripts', 'enqueue_attaboy');
-```
-
-Then upload the `attaboy.js` file to your theme's `/js/` directory.
-
-#### Option B: Using a Plugin (Code Snippets)
-If you're using the "Code Snippets" plugin:
-1. Go to Snippets → Add New
-2. Title: "Attaboy - UTM Parameter Tracker"
-3. Code Type: JavaScript Snippet
-4. Paste the JavaScript code from `attaboy.js`
-5. Location: Frontend
-6. Save and activate
-
-#### Option C: Add directly to theme files
-Add this to your theme's `header.php` before the closing `</head>` tag:
+Add this script tag to your HTML `<head>` or before the closing `</body>` tag:
 
 ```html
-<script>
-// Paste the entire contents of attaboy.js here
-</script>
+<script src="https://cdn.jsdelivr.net/gh/spiggott/attaboy@main/attaboy.js"></script>
 ```
 
-#### Option D: Google Tag Manager (Recommended for Marketing Teams)
-If you're using Google Tag Manager, this is often the preferred method:
+### Via Google Tag Manager
 
-1. **Create a Custom HTML Tag:**
-   - Go to your GTM container
-   - Click "Tags" → "New"
-   - Choose "Custom HTML" as the tag type
-   - Name: "Attaboy - UTM Parameter Tracker"
+1. Create a new **Custom HTML** tag
+2. Add the script tag above
+3. Set trigger to **All Pages** (or as needed)
+4. Save and publish
 
-2. **Add the Script:**
-   ```html
-   <script>
-   // Paste the entire contents of attaboy.js here
-   </script>
-   ```
+## Tracked Parameters
 
-3. **Set Trigger:**
-   - Trigger Type: "Page View"
-   - Choose "All Pages" (or create a custom trigger if you only want it on specific pages)
+Attaboy automatically tracks these UTM parameters:
 
-4. **Advanced Settings (Optional but Recommended):**
-   - Tag firing priority: Set to a higher number (e.g., 100) to ensure it loads early
-   - Enable "Once per page" if you want to prevent duplicate executions
-
-5. **Test and Publish:**
-   - Use GTM Preview mode to test
-   - Publish when ready
-
-**GTM Advantages:**
-- No code changes to WordPress
-- Easy to enable/disable without touching the website
-- Version control and rollback capabilities
-- Can be managed by marketing teams without developer access
-- Easy A/B testing of different configurations
-
-### Step 2: Configure Your WPForms
-
-1. **Create Hidden Fields in WPForms:**
-   - Edit your form in WPForms
-   - Add "Hidden Field" for each UTM parameter:
-	 - Field Label: "UTM Source" → Field Name: `utm_source`
-	 - Field Label: "UTM Medium" → Field Name: `utm_medium`
-	 - Field Label: "UTM Campaign" → Field Name: `utm_campaign`
-	 - Field Label: "UTM Term" → Field Name: `utm_term`
-	 - Field Label: "UTM Content" → Field Name: `utm_content`
-
-2. **Map Fields to ActiveCampaign:**
-   - In WPForms → Settings → Integrations → ActiveCampaign
-   - Map each UTM hidden field to corresponding custom fields in ActiveCampaign
-   - Make sure the custom fields exist in ActiveCampaign first
-
-### Step 3: Create Custom Fields in ActiveCampaign
-
-1. Go to Settings → Fields in ActiveCampaign
-2. Create custom fields:
-   - `UTM Source` (Text field)
-   - `UTM Medium` (Text field) 
-   - `UTM Campaign` (Text field)
-   - `UTM Term` (Text field)
-   - `UTM Content` (Text field)
-
-### Step 4: Test the Implementation
-
-1. **Test UTM Capture:**
-   - Visit: `https://seeztoday.com/?utm_medium=test&utm_source=testsource&utm_campaign=testcampaign`
-   - Open browser console (F12)
-   - You should see: "Attaboy: Stored UTM parameters: {utm_medium: 'test', utm_source: 'testsource', utm_campaign: 'testcampaign'}"
-
-2. **Test Form Population:**
-   - Navigate to a page with your WPForm
-   - Check browser console for: "Attaboy: Populated utm_medium with value: test"
-   - Inspect the hidden form fields to verify they contain the UTM values
-
-3. **Test Form Submission:**
-   - Submit the form
-   - Check ActiveCampaign to see if the UTM data appears in the contact record
+- `utm_source`
+- `utm_medium` 
+- `utm_campaign`
+- `utm_term`
+- `utm_content`
 
 ## How It Works
 
-1. **UTM Capture:** When a user visits a page with UTM parameters, the script extracts them from the URL
-2. **Storage:** UTM parameters are stored in localStorage (with cookie fallback) for 30 days
-3. **Form Population:** When WPForms load, the script automatically finds and populates matching hidden fields
-4. **Attribution:** When forms are submitted, the UTM data flows through to ActiveCampaign via WPForms integration
+1. **URL Detection**: When a user visits a page with UTM parameters (e.g., `yoursite.com?utm_source=google&utm_campaign=holiday`), Attaboy automatically captures them
+2. **Storage**: Parameters are stored in the browser's localStorage for persistence across sessions
+3. **Form Population**: On each page load, Attaboy looks for hidden form fields with names matching UTM parameters and auto-fills them
+4. **API Access**: Use the JavaScript API to programmatically access stored values
 
-## Key Features
+## API Reference
 
-- **Persistent Storage:** UTM data persists for 30 days across browser sessions
-- **Multiple Page Navigation:** Users can browse multiple pages and the UTM data is retained
-- **Fallback Support:** Uses cookies if localStorage is unavailable
-- **Dynamic Form Support:** Works with AJAX-loaded forms
-- **Debug Tools:** Console logging and utility functions for troubleshooting
+### `attaboy.getStored()`
 
-## Debugging
-
-Use these browser console commands to debug:
+Get all stored UTM parameters as an object.
 
 ```javascript
-// Check stored UTM parameters
-attaboy.getStored()
+// Returns object with all stored UTM parameters
+const allParams = attaboy.getStored();
+// Example result: { utm_source: 'google', utm_campaign: 'holiday', utm_medium: 'cpc' }
+```
 
+### `attaboy.getStored(parameter)`
+
+Get a specific UTM parameter value.
+
+```javascript
+// Get specific parameter
+const source = attaboy.getStored('utm_source');
+// Example result: 'google'
+
+const campaign = attaboy.getStored('utm_campaign');
+// Example result: 'holiday'
+```
+
+### `attaboy.getAllParams()`
+
+Get the list of all tracked parameter names.
+
+```javascript
+const trackedParams = attaboy.getAllParams();
+// Returns: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
+```
+
+### `attaboy.clearStored()`
+
+Clear all stored UTM parameters.
+
+```javascript
 // Clear all stored UTM data
-attaboy.clear()
+attaboy.clearStored();
+```
+
+### `attaboy.clearStored(parameter)`
+
+Clear a specific UTM parameter.
+
+```javascript
+// Clear specific parameter
+attaboy.clearStored('utm_source');
+```
+
+## Usage Examples
+
+### Basic Form Integration
+
+Create hidden form fields that will be automatically populated:
+
+```html
+<form action="/submit" method="post">
+  <!-- Visible form fields -->
+  <input type="email" name="email" placeholder="Your email" required>
+  <textarea name="message" placeholder="Your message" required></textarea>
+  
+  <!-- Hidden UTM fields - automatically populated by Attaboy -->
+  <input type="hidden" name="utm_source">
+  <input type="hidden" name="utm_medium">
+  <input type="hidden" name="utm_campaign">
+  <input type="hidden" name="utm_term">
+  <input type="hidden" name="utm_content">
+  
+  <button type="submit">Send Message</button>
+</form>
+```
+
+### Programmatic Access
+
+```javascript
+// Check if user came from a specific source
+if (attaboy.getStored('utm_source') === 'google') {
+  console.log('User came from Google!');
+}
+
+// Get all UTM data for analytics
+const utmData = attaboy.getStored();
+console.log('UTM Data:', utmData);
+
+// Send UTM data to your analytics
+gtag('event', 'form_submit', {
+  utm_source: attaboy.getStored('utm_source'),
+  utm_campaign: attaboy.getStored('utm_campaign')
+});
+```
+
+### Conditional Content
+
+```javascript
+// Show different content based on traffic source
+const source = attaboy.getStored('utm_source');
+const campaign = attaboy.getStored('utm_campaign');
+
+if (source === 'facebook' && campaign === 'social_promo') {
+  document.getElementById('special-offer').style.display = 'block';
+}
+```
+
+### Google Tag Manager Integration
+
+1. **Install Attaboy**: Create a Custom HTML tag with the CDN script
+2. **Use in other tags**: Reference UTM data in your GTM tags
+
+```javascript
+// In a Custom JavaScript variable in GTM
+function() {
+  return attaboy.getStored('utm_source') || 'direct';
+}
+
+// In a Custom HTML tag
+<script>
+  var source = attaboy.getStored('utm_source');
+  if (source) {
+	dataLayer.push({
+	  'event': 'utm_data_available',
+	  'utm_source': source,
+	  'utm_campaign': attaboy.getStored('utm_campaign')
+	});
+  }
+</script>
+```
+
+### CRM Integration
+
+```javascript
+// Send UTM data to your CRM when user converts
+function sendToCRM(userData) {
+  const utmData = attaboy.getStored();
+  
+  fetch('/api/crm/contact', {
+	method: 'POST',
+	headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	  ...userData,
+	  ...utmData, // Include all UTM parameters
+	  attribution_source: utmData.utm_source || 'direct',
+	  attribution_campaign: utmData.utm_campaign || 'none'
+	})
+  });
+}
+```
+
+## Example Scenarios
+
+### Scenario 1: User Journey Tracking
+1. User clicks ad: `yoursite.com?utm_source=google&utm_medium=cpc&utm_campaign=holiday`
+2. Attaboy stores: `{ utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'holiday' }`
+3. User browses multiple pages (UTM data persists)
+4. User fills out contact form → UTM data automatically included
+5. You can attribute the conversion to the Google Ads holiday campaign
+
+### Scenario 2: A/B Testing
+```javascript
+// Different landing page experiences based on campaign
+const campaign = attaboy.getStored('utm_campaign');
+
+if (campaign === 'test_variant_a') {
+  showVariantA();
+} else if (campaign === 'test_variant_b') {
+  showVariantB();
+} else {
+  showDefault();
+}
+```
+
+## Browser Support
+
+- ✅ Chrome (all versions)
+- ✅ Firefox (all versions) 
+- ✅ Safari (all versions)
+- ✅ Edge (all versions)
+- ✅ Internet Explorer 9+
+
+## Privacy & GDPR
+
+Attaboy stores data in the browser's localStorage, which:
+- Stays on the user's device (not sent to external servers)
+- Can be cleared by the user at any time
+- Respects browser privacy settings
+- Does not use cookies
+
+For GDPR compliance, consider:
+- Adding UTM tracking to your privacy policy
+- Providing users a way to clear their stored data
+- Respecting "Do Not Track" preferences if required
+
+```javascript
+// Example: Clear UTM data for privacy compliance
+function clearAllTrackingData() {
+  attaboy.clearStored();
+  console.log('All UTM tracking data cleared');
+}
 ```
 
 ## Troubleshooting
 
-### Hidden fields not populating:
-1. Check browser console for error messages
-2. Verify hidden field names match exactly: `utm_source`, `utm_medium`, etc.
-3. Inspect form HTML to confirm field names and selectors
+### UTM parameters not being captured
+- Check that the script loads before your forms render
+- Verify UTM parameters are in the URL when the page loads
+- Check browser console for any JavaScript errors
 
-### UTM data not reaching ActiveCampaign:
-1. Verify WPForms → ActiveCampaign integration is configured
-2. Check field mapping in WPForms settings
-3. Ensure custom fields exist in ActiveCampaign
-4. Test form submission and check ActiveCampaign contact records
+### Form fields not auto-populating  
+- Ensure hidden input fields have `name` attributes matching UTM parameter names exactly
+- Verify the DOM is fully loaded (script waits for `DOMContentLoaded`)
+- Check that field names match: `utm_source`, `utm_medium`, etc.
 
-### Script not loading:
-1. Check browser console for JavaScript errors
-2. Verify file paths are correct
-3. Ensure script is enqueued properly in WordPress
+### API methods not available
+- Confirm the script has loaded completely
+- Check that `window.attaboy` exists in browser console
+- Verify no JavaScript errors are preventing script execution
 
-## Security Notes
+## Contributing
 
-- The script only captures standard UTM parameters
-- Data is stored client-side only
-- No sensitive information is transmitted
-- UTM data expires automatically after 30 days
+Found a bug or have a feature request? Please open an issue on GitHub!
 
-## Browser Support
+## License
 
-This solution works in all modern browsers including:
-- Chrome 45+
-- Firefox 34+
-- Safari 10+
-- Edge 12+
+MIT License - feel free to use in your projects!
+
+---
+
+**Made with ❤️ for better attribution tracking**
